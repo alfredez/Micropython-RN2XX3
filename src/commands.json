@@ -1,0 +1,169 @@
+{
+    "SYSTEM": {
+        "SLEEP": "sys sleep {0}",
+        "RESET": "sys reset",
+        "FACTORY_RESET": "sys factoryRESET",
+        "ERASEFW": "sys eraseFW",
+        "VERSION": "sys get ver",
+        "VOLTAGE": "sys get vdd",
+        "HWEUI": "sys get hweui",
+        "NVM": {
+            "GET": "sys get nvm {0}",
+            "SET": "sys set nvm {0} {1}"
+        },
+        "PIN": {
+            "GPIO0": "sys set pindig GPIO0 {0}",
+            "GPIO1": "sys set pindig GPIO1 {0}",
+            "GPIO2": "sys set pindig GPIO2 {0}",
+            "GPIO3": "sys set pindig GPIO3 {0}",
+            "GPIO4": "sys set pindig GPIO4 {0}",
+            "GPIO5": "sys set pindig GPIO5 {0}",
+            "GPIO6": "sys set pindig GPIO6 {0}",
+            "GPIO7": "sys set pindig GPIO7 {0}",
+            "GPIO8": "sys set pindig GPIO8 {0}",
+            "GPIO9": "sys set pindig GPIO9 {0}",
+            "GPIO10": "sys set pindig GPIO10 {0}",
+            "GPIO11": "sys set pindig GPIO11 {0}",
+            "GPIO12": "sys set pindig GPIO12 {0}",
+            "GPIO13": "sys set pindig GPIO13 {0}",
+            "GPIO14": "sys set pindig GPIO14 {0}",
+            "UART_CTS": "sys set pindig UART_CTS {0}",
+            "UART_RTS": "sys set pindig UART_RTS {0}"
+        }
+    },
+    "MAC": {
+        "RESET_BAND": {
+            "433": "mac reset 433",
+            "868": "mac reset 868"
+        },
+        "TX": {
+            "CONFIRMED": "mac tx cnf {0} {1}",
+            "UNCONFIRMED": "mac tx uncnf {0} {1}"
+        },
+        "SAVE": "mac save",
+        "PAUSE": "mac pause",
+        "RESUME": "mac resume",
+        "DEVADDR": {
+            "GET": "mac get devaddr",
+            "SET": "mac set devaddr {0}"
+        },
+        "DEVEUI": {
+            "GET": "mac get deveui",
+            "SET": "mac set deveui {0}"
+        },
+        "APPEUI": {
+            "GET": "mac get appeui",
+            "SET": "mac set appeui {0}"
+        },
+        "DATARATE": {
+            "GET": "mac get dr",
+            "SET": "mac set dr {0}"
+        },
+        "BAND": "mac get band",
+        "POWER_INDEX": {
+            "GET": "mac get pwridx",
+            "SET": "mac set pwridx {0}"
+        },
+        "ADAPTIVE_DATARATE": {
+            "GET": "mac get adr",
+            "SET": "mac set adr {0}"
+        },
+        "RETX": {
+            "GET": "mac get retx",
+            "SET": "mac set retx {0}"
+        },
+        "RXDELAY1": {
+            "GET": "mac get rxdelay1",
+            "SET": "mac set rxdelay1 {0}"
+        },
+        "RXDELAY2": "mac get rxdelay2",
+        "AUTO_REPLY": {
+            "GET": "mac get ar",
+            "SET": "mac set ar {0}"
+        },
+        "RX2": {
+            "GET": "mac get rx2 {0}",
+            "SET": "mac set rx2 {0} {1}"
+        },
+        "DYCLEPS": "mac get dcycleps",
+        "MARGIN": "mac get mrgn",
+        "GATEWAY_NUMBER": "mac get gwnb",
+        "STATUS": "mac get status",
+        "JOIN": "mac join {0}",
+        "NWKSKEY": "mac set nwkskey {0}",
+        "APPSKEY": "mac set appskey {0}",
+        "APPKEY": "mac set appkey {0}",
+        "BAT": "mac set bat {0}",
+        "LINK_CHECK": "mac set linkchk {0}"
+    },
+    "RADIO": {
+        "RX": "radio rx {0}",
+        "TX": "radio tx {0}",
+        "CW": "radio cw {0}",
+        "BT": {
+            "GET": "radio get bt",
+            "SET": "radio set bt {0}"
+        },
+        "MODE": {
+            "GET": "radio get mod",
+            "SET": "radio set mod {0}"
+        },
+        "FREQUENCY": {
+            "GET": "radio get freq",
+            "SET": "radio set freq {0}"
+        },
+        "POWER": {
+            "GET": "radio get pwr",
+            "SET": "radio set pwr {0}"
+        },
+        "SF": {
+            "GET": "radio get sf",
+            "SET": "radio set sf {0}"
+        },
+        "AUTOFREQBAND": {
+            "GET": "radio get afcbw",
+            "SET": "radio set afcbw {0}"
+        },
+        "RXBW": {
+            "GET": "radio get rxbw",
+            "SET": "radio set rxbw {0}"
+        },
+        "BITRATE": {
+            "GET": "radio get bitrate",
+            "SET": "radio set bitrate {0}"
+        },
+        "FREQDEV": {
+            "GET": "radio get fdev",
+            "SET": "radio set fdev {0}"
+        },
+        "PREAMBLE": {
+            "GET": "radio get prlen",
+            "SET": "radio set prlen {0}"
+        },
+        "CRC": {
+            "GET": "radio get crc",
+            "SET": "radio set crc {0}"
+        },
+        "IQI": {
+            "GET": "radio get iqi",
+            "SET": "radio set iqi {0}"
+        },
+        "CODING_RATE": {
+            "GET": "radio get cr",
+            "SET": "radio set cr {0}"
+        },
+        "WATCHDOG": {
+            "GET": "radio get wdt",
+            "SET": "radio set wdt {0}"
+        },
+        "SYNC": {
+            "GET": "radio get sync",
+            "SET": "radio set sync {0}"
+        },
+        "BANDWIDTH": {
+            "GET": "radio get bw",
+            "SET": "radio set bw {0}"
+        },
+        "SNR": "radio get snr"
+    }
+}
