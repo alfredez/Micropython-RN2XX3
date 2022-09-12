@@ -11,27 +11,15 @@
             "GET": "sys get nvm {0}",
             "SET": "sys set nvm {0} {1}"
         },
-        "PIN": {
-            "GPIO0": "sys set pindig GPIO0 {0}",
-            "GPIO1": "sys set pindig GPIO1 {0}",
-            "GPIO2": "sys set pindig GPIO2 {0}",
-            "GPIO3": "sys set pindig GPIO3 {0}",
-            "GPIO4": "sys set pindig GPIO4 {0}",
-            "GPIO5": "sys set pindig GPIO5 {0}",
-            "GPIO6": "sys set pindig GPIO6 {0}",
-            "GPIO7": "sys set pindig GPIO7 {0}",
-            "GPIO8": "sys set pindig GPIO8 {0}",
-            "GPIO9": "sys set pindig GPIO9 {0}",
-            "GPIO10": "sys set pindig GPIO10 {0}",
-            "GPIO11": "sys set pindig GPIO11 {0}",
-            "GPIO12": "sys set pindig GPIO12 {0}",
-            "GPIO13": "sys set pindig GPIO13 {0}",
-            "GPIO14": "sys set pindig GPIO14 {0}",
-            "UART_CTS": "sys set pindig UART_CTS {0}",
-            "UART_RTS": "sys set pindig UART_RTS {0}"
-        }
+        "PINDIG": {
+            "GET": "sys get pindig {0}",
+            "SET": "sys set pindig {0} {1}"
+        },
+        "PINMODE": "sys set pinmode {0} {1}",
+        "PINANA": "sys get pinana {0}"
     },
     "MAC": {
+        "RESET": "mac reset",
         "RESET_BAND": {
             "433": "mac reset 433",
             "868": "mac reset 868"
@@ -51,6 +39,10 @@
             "GET": "mac get deveui",
             "SET": "mac set deveui {0}"
         },
+        "DNCTR": {
+            "GET": "mac get dnctr",
+            "SET": "mac set dnctr {0}"
+        },
         "APPEUI": {
             "GET": "mac get appeui",
             "SET": "mac set appeui {0}"
@@ -60,6 +52,28 @@
             "SET": "mac set dr {0}"
         },
         "BAND": "mac get band",
+        "CHANNEL": {
+            "FREQUENCY": {
+                "GET": "mac get ch freq {0}",
+                "SET": "mac set ch freq {0} {1}"
+            },
+            "DCYCLE": {
+                "GET": "mac get ch dcycle {0}",
+                "SET": "mac set ch dcycle {0} {1}"
+            },
+            "DRRANGE": {
+                "GET": "mac get ch drrange {0}",
+                "SET": "mac set ch drrange {0} {1} {2}"
+            },
+            "STATUS": {
+                "GET": "mac get status {0}",
+                "SET": "mac set ch status {0} {1}"
+            }
+        },
+        "CLASS": {
+            "GET": "mac get class",
+            "SET": "mac set class {0}"
+        },
         "POWER_INDEX": {
             "GET": "mac get pwridx",
             "SET": "mac set pwridx {0}"
@@ -94,12 +108,35 @@
         "APPSKEY": "mac set appskey {0}",
         "APPKEY": "mac set appkey {0}",
         "BAT": "mac set bat {0}",
-        "LINK_CHECK": "mac set linkchk {0}"
+        "LINK_CHECK": "mac set linkchk {0}",
+        "MCAST": {
+            "GET": "mac get mcast",
+            "SET": "mac set mcast on"
+        },
+        "MCAST_APPSKEY": "mac set mcastappskey {0}",
+        "MCAST_DEVADDR": {
+            "GET": "mac get mcastdevaddr",
+            "SET": "mac set mcastdevaddr {0}"
+        },
+        "MCAST_DNCTR": {
+            "GET": "mac get mcastdnctr",
+            "SET": "mac set mcastdnctr {0}"
+        },
+        "MCAST_NWKSKEY": "mac set mcastnwkskey {0}",
+        "SYNC": {
+            "GET": "mac get sync",
+            "SET": "mac set sync {0}"
+        },
+        "UPCTR": {
+            "GET": "mac get upctr",
+            "SET": "mac set upctr {0}"
+        }
     },
     "RADIO": {
         "RX": "radio rx {0}",
         "TX": "radio tx {0}",
         "CW": "radio cw {0}",
+        "RXSTOP": "radio rxstop",
         "BT": {
             "GET": "radio get bt",
             "SET": "radio set bt {0}"
@@ -116,6 +153,7 @@
             "GET": "radio get pwr",
             "SET": "radio set pwr {0}"
         },
+        "RSSI": "radio get rssi",
         "SF": {
             "GET": "radio get sf",
             "SET": "radio set sf {0}"

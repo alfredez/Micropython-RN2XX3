@@ -1,166 +1,216 @@
 """
-                      [ RN2483 Library ]
-    MicroPython library for RN2483 LoRaWAN transceiver
+                      [ RN2XX3 Library ]
+    MicroPython library for RN2483 and RN2903 LoRaWAN module
     This implementation is meant to be used on embedded devices that supports MicroPython.
     [-------------------------------------------------------]
     Version:
-    [0.1]:
+    [1.0]:
         + Changes:
-            - Added compatibility for Raspberry Pi Pico
+            - Added compatibility for Raspberry Pi Pico & ESP32
             - Added LoRaWAN configuration method
             - Added Command class
+            - Wrote proper comments for classes and functions
 
-        + TODO:
-            - Complete the RN2XX3 Class
-            - Complete the Command class
-            - Add error handling
-            - Test ESP32 compatibility
-            - Writing proper comments for classes and functions
+        + TODO
+            - Test compatibility with ESP8223
 """
-import binascii
-from src.exceptions import HostError
+from binascii import hexlify, unhexlify
 import time
 from src.Command import Command
 
 
-class Lora:
-    """Commands for RN2483 and RN2903 can be found in the product user guide by Microchip"""
+class RN2xx3:
+    """MicroPython library to communicate with the Microchip RN2483 and RN2903 module using a simple UART interface"""
 
-    def __init__(self, connection=None):
-        """ Class init, check if serial connection is open """
+    def __init__(self, connection):
+        """
+        Construct a RN2xx3 object representing the module
+
+        Args:
+            connection (UART): UART object of where the module is connected
+        """
         self.connection = connection
-        self.commands = Command(path='commands.json')
 
-        self.activation = {
-            "otaa": True,
-            "deveui": None,
-            "appeui": None,
-            "appkey": None,
-            "devAddr": None,
-            "AppSKey": None,
-            "NwkSKey": None,
-            "joined": False
-        }
+        # Access to all commands from Command class
+        self.commands = Command(path='src/commands.json')
 
-        if self.connection is None:
-            raise HostError
+        # Dictonary to store activation settings
+        self.activation = {}
 
-    def config_otaa(self, appkey, appeui):
-        """ Configure Over The Air Authentication """
+    def config_otaa(self, appeui: str, appkey: str) -> bool:
+        """
+        Configure Over The Air Authentication
+
+        Args:
+            appkey (str): 16-byte hexadecimal number representing the application key
+            appeui (str): 8-byte hexadecimal number representing the application EUI
+
+        Returns:
+            joined (bool): bool value representing if the join procedure was successful
+
+        """
+        # Storing activation settings
         self.activation['otaa'] = True
         self.activation['appeui'] = appeui
         self.activation['appkey'] = appkey
-        cmd = self.commands
+        self.activation['joined'] = False
 
-        deveui = self.execute(self.commands.sys_hweui())
+        # get hweui, otherwise try untill successful
+        deveui = self.execute(self.commands.sys_get_hweui())
 
         while len(deveui) != 16:
-            deveui = self.execute(self.commands.sys_hweui())
+            deveui = self.execute(self.commands.sys_get_hweui())
             time.sleep_ms(10000)
 
         print("When using OTAA, register this DevEUI: {0}".format(deveui))
         self.activation['deveui'] = deveui
 
-        response = {"deveui": None,
-                    "appeui": None,
-                    "appkey": None,
-                    "TxoutputPower": None,
-                    "ARD": None,
-                    "AR": None,
-                    "status": None}
-
+        # Creating a list of commands to configure the module
         list_cmd = [
-            cmd.mac_reset_band(),
-            cmd.mac_deveui_set(self.activation['deveui']),
-            cmd.mac_appeui_set(appeui),
-            cmd.mac_appkey(appkey),
-            cmd.mac_pwridx_set(1),
-            cmd.mac_adr_set('off'),
-            cmd.mac_autoreply_set('off'),
-            cmd.mac_save()
+            self.commands.mac_reset_band(868),
+            self.commands.mac_set_deveui(self.activation['deveui']),
+            self.commands.mac_set_appeui(appeui),
+            self.commands.mac_set_appkey(appkey),
+            self.commands.mac_set_pwridx(1),
+            self.commands.mac_set_adr('off'),
+            self.commands.mac_set_autoreply('off'),
+            self.commands.mac_save()
         ]
 
+        # Executing all the commands
         for x in list_cmd:
             self.execute(x)
 
-        print('trying to join')
+        # Try to join the network
+        print('Trying to join')
         while not self.activation['joined']:
-            status = self.execute(cmd.mac_join("otaa"))
+            status = self.execute(self.commands.mac_join("otaa"))
             if self.determine_response(status) is True:
                 self.activation['joined'] = True
                 break
             time.sleep_ms(5000)
         print("Successfully joined TTN")
-        return response
+        return self.activation['joined']
 
-    def config_abp(self, devAddr, AppSKey, NwkSKey):
-        """ Configure Authentication By Personalisation."""
+    def config_abp(self, devAddr: str, AppSKey: str, NwkSKey: str) -> bool:
+        """
+        Configure Authentication By Personalisation
+
+        Args:
+            devAddr (str): 4-byte hexadecimal number representing the device address
+            AppSKey (str): 16-byte hexadecimal number representing the application session key
+            NwkSKey (str): 16-byte hexadecimal number representing the network session key
+
+        Returns:
+            joined (bool): bool value representing if the join procedure was successful
+        """
+
+        # Storing activation settings
+        self.activation['otaa'] = False
         self.activation['devAddr'] = devAddr
         self.activation['AppSKey'] = AppSKey
         self.activation['NwkSKey'] = NwkSKey
-        cmd = self.commands
+        self.activation['joined'] = False
 
-        response = {"devAddr": None,
-                    "AppSKey": None,
-                    "NwkSKey": None,
-                    "TxoutputPower": None,
-                    "ARD": None,
-                    "AR": None,
-                    "status": None}
-
+        # Creating a list of commands to configure the module
         list_cmd = [
-            cmd.mac_reset_band(),
-            cmd.mac_devAddr_set(devAddr),
-            cmd.mac_appSKey(AppSKey),
-            cmd.mac_nwkSKey(NwkSKey),
-            cmd.mac_pwridx_set(1),
-            cmd.mac_adr_set('off'),
-            cmd.mac_autoreply_set('off'),
-            cmd.mac_save()]
+            self.commands.mac_reset_band(868),
+            self.commands.mac_set_devaddr(devAddr),
+            self.commands.mac_set_appskey(AppSKey),
+            self.commands.mac_set_nwkskey(NwkSKey),
+            self.commands.mac_set_pwridx(1),
+            self.commands.mac_set_adr('off'),
+            self.commands.mac_set_autoreply('off'),
+            self.commands.mac_save()
+        ]
 
+        # Executing all the commands
         for x in list_cmd:
             self.execute(x)
 
+        # Try to join the network
         print('trying to join')
         while not self.activation['joined']:
-            status = self.execute(cmd.mac_join("abp"))
+            status = self.execute(self.commands.mac_join("abp"))
             if self.determine_response(status) is True:
                 self.activation['joined'] = True
                 break
             time.sleep_ms(5000)
         print("Successfully joined TTN")
-        return (response)
+        return self.activation['joined']
 
-    def execute(self, command):
-        print('command {0}'.format(command))
-        ''' Passes and Executes command to device, returns devices response '''
+    def execute(self, command: str) -> str:
+        """
+        Passes the command to the device to be executed. Upon successful reception a command,
+        based on the specific command the module will respond.
+        For more info read the user's guide (Chapter 2.2 Command Organization)
+
+        Args:
+            command (str): Example: mac tx uncnf 1 23A5
+
+        Returns:
+            response (str): Response from the module; Example: ok
+        """
+        print('executing command {0}'.format(command))
+
+        # Write the command to the module
         self.connection.write(bytes(str(command) + "\r\n", "utf-8"))
         time.sleep_ms(100)
+
+        # Read the response from the module
         response = self.connection.readline()
         if response is None:
-            return (None)
+            return ''
+
+        # Decode the response
         response = response.decode("utf-8").strip("\r\n")
-        print('execute respons command {0}'.format(response))
+        print('response module {0}'.format(response))
         return response
 
     def send(self, data):
-        """ Send data """
+        """
+        Function to pass the data to the transmission function, which can be (un)confirmed
+
+        Args:
+            data (str): Data that needs to be transmitted
+        """
         self.txUncnf(data)
 
     def txCnf(self, data):
-        """Send data without confirmation"""
+        """
+        Send data with confirmation
+
+        Encode the data and prepare the command to be passed to the module
+
+        Args:
+            data (str): Data that needs to be transmitted
+        """
+        port_number = 1
         buffer = self.encodeData(data)
-        command = self.commands.mac_tx_cnf(1, buffer)
+        command = self.commands.mac_tx_cnf(port_number, buffer)
         self.txCommand(command)
 
     def txUncnf(self, data):
-        """Send data without confirmation"""
+        """
+        Send data without confirmation
+
+        Encode the data and prepare the command to be passed to the module
+
+        Args:
+            data (str): Data that needs to be transmitted
+        """
+        port_number = 1
         buffer = self.encodeData(data)
-        command = self.commands.mac_tx_uncfn(1, buffer)
+        command = self.commands.mac_tx_uncfn(port_number, buffer)
         self.txCommand(command)
 
     def txCommand(self, command):
-        """Transmission Command"""
+        """
+        Try to transmit the command and determine the result
+
+        Args:
+            command (str): Example: mac tx uncnf 1 23A5
+        """
         send_succes = False
         retry = 0
 
@@ -172,12 +222,40 @@ class Lora:
             retry += 1
 
     def encodeData(self, data):
-        """Encode data to hex"""
+        """
+        Convert the data into a hexadecimal number representing
+
+        Args:
+            data (str): Data that needs to be transmitted
+
+        Returns:
+            buffer (str): A hexadecimal number representation of the data
+        """
         encoded = bytes(data, 'utf-8')
-        buffer = binascii.hexlify(encoded).decode('utf-8')
+        buffer = hexlify(encoded).decode('utf-8')
         return buffer
 
+    def decodeData(self, rx_data):
+        """
+        Convert the received hexadecimal number representing data into a string readable for user's and print the result
+
+        Args:
+            rx_data (str): The received hexadecimal number representing data
+        """
+        data = unhexlify(rx_data).decode('utf-8')
+        print(data)
+
     def determine_response(self, response):
+        """
+        After transmitting, determine the response received from the module.
+        For more info read the user's guide (Chapter 2.2 Command Organization)
+
+        Args:
+            response (str): Response from the device
+
+        Returns:
+            (bool): bool value representing if the transmission was successful
+        """
         if response == 'ok':
             time.sleep_ms(10000)
             transmission_response = self.connection.readline()
@@ -186,7 +264,9 @@ class Lora:
 
             if transmission_response == 'mac_tx_ok':
                 return True
-            elif transmission_response == 'mac_rx':
+            elif 'mac_rx' in transmission_response:
+                rx_data = transmission_response.rsplit(" ")[2]
+                self.decodeData(rx_data)
                 return True
             elif transmission_response == 'mac_err':
                 # init()
@@ -208,8 +288,7 @@ class Lora:
         elif response == 'invalid_param':
             return False
         elif response == 'not_joined':
-            self.activation['joined'] = False
-            self.reconnect()
+            self.rejoin()
             return False
         elif response == 'no_free_ch':
             return False
@@ -228,8 +307,27 @@ class Lora:
         else:
             return False
 
-    def reconnect(self):
+    def rejoin(self):
+        """
+        When the module is not joined to the network anymore, try to reconnect.
+
+        Returns:
+            joined (bool): bool value representing if the join procedure was successful
+        """
         if self.activation['otaa']:
             return self.config_otaa(self.activation['appkey'], self.activation['appeui'])
-        elif not self.activation['otaa']:
+        else:
             return self.config_abp(self.activation['devAddr'], self.activation['NwkSKey'], self.activation['AppSKey'])
+
+    def serial_info(self):
+        """
+        Returns:
+            Serial connection info
+        """
+        return self.connection
+
+    def serial_close(self):
+        """
+        Turn off the UART bus.
+        """
+        self.connection.deinit()
