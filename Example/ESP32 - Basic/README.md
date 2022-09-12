@@ -71,4 +71,4 @@ function decodeUplink(input) {
   };
 }
 ```
-![Decoded-uplink](/home/alfred/PycharmProjects/Micropython-RN2483/Images/decoded-uplink.png)
+![Decoded-uplink](https://github.com/alfredez/Micropython-RN2XX3/blob/main/Images/decoded-uplink.png)
