@@ -1,18 +1,8 @@
 """
-                      [ RN2XX3 Library ]
     MicroPython library for RN2483 and RN2903 LoRaWAN module
-    This implementation is meant to be used on embedded devices that supports MicroPython.
-    [-------------------------------------------------------]
-    Version:
-    [1.0]:
-        + Changes:
-            - Added compatibility for Raspberry Pi Pico & ESP32
-            - Added LoRaWAN configuration method
-            - Added Command class
-            - Wrote proper comments for classes and functions
 
-        + TODO
-            - Test compatibility with ESP8223
+    Author: Alfred Espinosa Encarnación
+    Date: 07-09-2022
 """
 from binascii import hexlify, unhexlify
 import time
@@ -32,9 +22,12 @@ class RN2xx3:
         self.connection = connection
 
         # Access to all commands from Command class
-        self.commands = Command(path='src/commands.json')
+        try:
+            self.commands = Command(path='src/commands.json')
+        except FileNotFoundError as e:
+            print(e)
 
-        # Dictonary to store activation settings
+        # Dictionary to store activation settings
         self.activation = {}
 
     def config_otaa(self, appeui: str, appkey: str) -> bool:
@@ -201,7 +194,7 @@ class RN2xx3:
         """
         port_number = 1
         buffer = self.encodeData(data)
-        command = self.commands.mac_tx_uncfn(port_number, buffer)
+        command = self.commands.mac_tx_uncnf(port_number, buffer)
         self.txCommand(command)
 
     def txCommand(self, command):
@@ -269,14 +262,14 @@ class RN2xx3:
                 self.decodeData(rx_data)
                 return True
             elif transmission_response == 'mac_err':
-                # init()
+                self.rejoin()
                 return False
             elif transmission_response == 'invalid_data_len':
                 return True
             elif transmission_response == 'radio_tx_ok':
                 return True
             elif transmission_response == 'radio_err':
-                # init()
+                self.rejoin()
                 return False
             elif transmission_response == 'accepted':
                 return True
@@ -331,3 +324,6 @@ class RN2xx3:
         Turn off the UART bus.
         """
         self.connection.deinit()
+
+    def version(self):
+        return self.execute(self.commands.sys_get_ver())

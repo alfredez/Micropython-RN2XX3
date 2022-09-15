@@ -1,5 +1,4 @@
 """
-                      [ Command Class ]
     Commands for RN2483 and RN2903 can be found in the product user guide by Microchip:
 
     "RN2483 LoRa® Technology Module Command Reference User’s Guide"
@@ -8,12 +7,8 @@
     "RN2903 LoRa® Technology Module Command Reference User’s Guide"
     https://ww1.microchip.com/downloads/en/DeviceDoc/RN2903%20LoRa%20Technology%20Module%20Command%20Reference%20User%20Guide-40001811B.pdf
 
-    [-------------------------------------------------------]
-    Version:
-    [1.0]:
-        + Changes:
-            - Added command dictionary
-            - Added all commands based on the RN2483 and RN2903 user's guide
+    Author: Alfred Espinosa Encarnación
+    Date: 07-09-2022
 """
 from json import load
 
@@ -41,7 +36,7 @@ class Command:
     """[SYSTEM COMMANDS]"""
 
     def sys_sleep(self, length: int) -> str:
-        return self.commands["SYSTEM"]["SLEEP"].formmat(length)
+        return self.commands["SYSTEM"]["SLEEP"].format(length)
 
     def sys_reset(self):
         return self.commands["SYSTEM"]["RESET"]
@@ -59,7 +54,7 @@ class Command:
         return self.commands["SYSTEM"]["PINDIG"]["SET"].format(pin_name, pin_state)
 
     def sys_set_pinmode(self, pin_name: str, pin_mode: str) -> str:
-        return self.commands["SYSTEM"]["PINDMODE"].format(pin_name, pin_mode)
+        return self.commands["SYSTEM"]["PINMODE"].format(pin_name, pin_mode)
 
     def sys_get_ver(self):
         return self.commands["SYSTEM"]["VERSION"]
@@ -100,7 +95,7 @@ class Command:
     def mac_tx_cnf(self, portno: int, data: str) -> str:
         return self.commands["MAC"]["TX"]["CONFIRMED"].format(portno, data)
 
-    def mac_tx_uncfn(self, portno: int, data: str) -> str:
+    def mac_tx_uncnf(self, portno: int, data: str) -> str:
         return self.commands["MAC"]["TX"]["UNCONFIRMED"].format(portno, data)
 
     def mac_join(self, mode: str) -> str:
@@ -164,7 +159,7 @@ class Command:
         return self.commands["MAC"]["MCAST"]['SET'].format(state)
 
     def mac_set_mcastappskey(self, mcastApplicationSessionkey: str) -> str:
-        return self.commands["MAC"]["MCAST_APPSKEY"]['SET'].format(mcastApplicationSessionkey)
+        return self.commands["MAC"]["MCAST_APPSKEY"].format(mcastApplicationSessionkey)
 
     def mac_set_mcastdevaddr(self, mcastAddress: str) -> str:
         return self.commands["MAC"]["MCAST_DEVADDR"]['SET'].format(mcastAddress)
@@ -173,7 +168,7 @@ class Command:
         return self.commands["MAC"]["MCAST_DNCTR"]['SET'].format(fMcastCntDown)
 
     def mac_set_mcastnwkskey(self, mcastNetworkSessionkey: str) -> str:
-        return self.commands["MAC"]["MCAST_NWKSKEY"]['SET'].format(mcastNetworkSessionkey)
+        return self.commands["MAC"]["MCAST_NWKSKEY"].format(mcastNetworkSessionkey)
 
     def mac_set_nwkskey(self, nwkSessKey: str) -> str:
         return self.commands["MAC"]["NWKSKEY"].format(nwkSessKey)
@@ -263,7 +258,7 @@ class Command:
         return self.commands["MAC"]["RXDELAY1"]['GET']
 
     def mac_get_rxdelay_two(self):
-        return self.commands["MAC"]["RXDELAY2"]['GET']
+        return self.commands["MAC"]["RXDELAY2"]
 
     def mac_get_status(self):
         return self.commands["MAC"]["STATUS"]
@@ -370,7 +365,7 @@ class Command:
         return self.commands["RADIO"]["POWER"]["GET"]
 
     def radio_get_rssi(self):
-        return self.commands["RADIO"]["RSSI"]["GET"]
+        return self.commands["RADIO"]["RSSI"]
 
     def radio_get_rxbw(self):
         return self.commands["RADIO"]["RXBW"]["GET"]

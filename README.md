@@ -1,4 +1,4 @@
-# Micropython-RN2XX3
+# MicroPython-RN2XX3
 A MicroPython library to communicate with the Microchip RN2483 and RN2903 LoRaWAN module using a simple UART interface.
 # Installation
 Clone or download this repository. Recommended IDE's to code and flash:
@@ -9,9 +9,11 @@ Clone or download this repository. Recommended IDE's to code and flash:
 Examples with this library are meant to be used to send data to The Things Stack.
 The current examples are for the following devices:
 ### Devices
-- [Raspberry Pi Pico](Example/Raspberry%20Pi%20Pico%20-%20Basic)
-- [ESP32](Example/ESP32%20-%20Basic) 
+- [Raspberry Pi Pico](Examples/Raspberry%20Pi%20Pico%20-%20Basic)
+- [ESP32](Examples/ESP32%20-%20Basic) 
 
+# Credits
+Credit to jpmeijers for [RN2483-Arduino-Library](https://github.com/jpmeijers/RN2483-Arduino-Library)
 # License
 All code in this repository falls under the Apache v2.0 license, unless otherwise stated in the header of the respective file.
 

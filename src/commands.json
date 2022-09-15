@@ -29,6 +29,7 @@
             "UNCONFIRMED": "mac tx uncnf {0} {1}"
         },
         "SAVE": "mac save",
+        "FORCE_ENABLE": "mac forceENABLE",
         "PAUSE": "mac pause",
         "RESUME": "mac resume",
         "DEVADDR": {
@@ -66,7 +67,7 @@
                 "SET": "mac set ch drrange {0} {1} {2}"
             },
             "STATUS": {
-                "GET": "mac get status {0}",
+                "GET": "mac get ch status {0}",
                 "SET": "mac set ch status {0} {1}"
             }
         },
