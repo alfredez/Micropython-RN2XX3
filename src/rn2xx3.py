@@ -27,6 +27,12 @@ class RN2xx3:
         except FileNotFoundError as e:
             print(e)
 
+        # Set module type
+        try:
+            self.module = self.set_module_type()
+        except RuntimeError as e:
+            print(e)
+
         # Dictionary to store activation settings
         self.activation = {}
 
@@ -49,7 +55,7 @@ class RN2xx3:
         self.activation['joined'] = False
 
         # get hweui, otherwise try untill successful
-        deveui = self.execute(self.commands.sys_get_hweui())
+        deveui = self.hweui()
 
         while len(deveui) != 16:
             deveui = self.execute(self.commands.sys_get_hweui())
@@ -320,10 +326,126 @@ class RN2xx3:
         return self.connection
 
     def serial_close(self):
-        """
-        Turn off the UART bus.
-        """
+        """Turn off the UART bus"""
         self.connection.deinit()
 
     def version(self):
+        """Returns voltage of the module"""
         return self.execute(self.commands.sys_get_ver())
+
+    def hweui(self):
+        """Returns hweui of the module"""
+        return self.execute(self.commands.sys_get_hweui())
+
+    def appkey(self):
+        """Returns appkey of the module"""
+        return self.activation["appkey"]
+
+    def deveui(self):
+        """Returns deveui of the module"""
+        return self.execute(self.commands.mac_get_deveui())
+
+    def reset(self):
+        """Resets the module"""
+        self.execute(self.commands.sys_reset())
+
+    def factory_reset(self):
+        """Factory resets the module"""
+        return self.execute(self.commands.sys_factory_reset())
+
+    def sleep(self, length):
+        """
+        Sets the module to sleep
+        Args:
+            length (int): Duration in milliseconds
+
+        Returns:
+            ok - after the system gets back from Sleep mode
+            invalid_param - if the length is not valid
+        """
+        return self.execute(self.commands.sys_sleep(length))
+
+    def get_value_at_address(self, address):
+        """
+        Returns value at memory address - address is in hexadecimal
+
+        Args:
+            address (str): hexadecimal number representing user EEPROM address, from 300 to 3FF
+
+        Returns:
+            00 – FF (hexadecimal value from 00 to FF) - if the address is valid
+            invalid_param - if the address is not valid
+        """
+        return self.execute(self.commands.sys_get_nvm(address))
+
+    def set_value_at_address(self, address, data):
+        """
+        Sets value at memory address - value and address are in hexadecimal
+
+        Args:
+            address (str): hexadecimal number representing user EEPROM address, from 300 to 3FF
+            data (str): hexadecimal number representing data, from 00 to FF
+
+        Returns:
+            ok - if the parameters (address and data) are valid
+            invalid_param - if the parameters (address and data) are not valid
+        """
+        return self.execute(self.commands.sys_set_nvm(address, data))
+
+    def set_pin(self, pinname, pinstate):
+        """
+        This command allows the user to modify the unused pins available for use by the
+        module. The selected <pinname> is driven high or low depending on the desired <pinstate>.
+
+        Args:
+            pinname (str): string representing the pin. Parameter can be: GPIO0 - GPIO13, UART_CTS, UART_RTS, TEST0, TEST1
+            pinstate (int): decimal number representing the state. Parameter values can be: 0 or 1.
+
+        Returns:
+            ok - if the parameters are valid
+            invalid_param - if the parameters are not valid
+        """
+        return self.execute(self.commands.sys_set_pindig(pinname, pinstate))
+
+    def adaptive_datarate(self, state):
+        """
+        Sets the adaptive datarate to on or off
+
+        Args:
+            state (str): can be on or off
+
+        Returns:
+            ok - if the parameters are valid
+            invalid_param - if the parameters are not valid
+        """
+        return self.execute(self.commands.mac_set_adr(state))
+
+    def get_snr(self):
+        """
+        Returns module's Signal to Noise Ratio
+
+        Returns:
+            signed decimal number representing the signal-to-noise ratio (SNR), from -128 to 127.
+        """
+        return self.execute(self.commands.radio_get_snr())
+
+    def set_module_type(self):
+        """Checks and store the type of module"""
+        self.module = self.version().rsplit(" ")[0]
+        return self.module
+
+    def module_type(self):
+        """Returns type of module"""
+        return self.module
+
+    def set_data_rate(self, datarate):
+        """
+        Sets data rate to be used for the next transmission
+        Args:
+            datarate (): decimal number representing the data rate, from 0 and 7, but within the limits of the data rate range for the defined channels
+
+        Returns:
+            ok if data rate is valid
+            invalid_param if data rate is not valid
+        """
+        return self.execute(self.commands.mac_set_dr(datarate))
